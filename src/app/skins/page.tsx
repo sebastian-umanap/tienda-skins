@@ -43,47 +43,67 @@ export default function SkinsPage() {
   }, [])
 
   return (
-<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
-  {skins.map((skin, index) => {
-    const imageUrl = tileMap[skin.itemId]
-    const discount = (skin.discount * 100).toFixed(0)
-    return (
-      <div
-        key={index}
-        className="relative rounded overflow-hidden shadow-lg group"
-      >
-        {/* Fondo con imagen */}
-        {imageUrl && (
-          <img
-            src={imageUrl}
-            alt={skin.name}
-            className="w-full h-full object-cover group-hover:brightness-75 transition duration-300"
-          />
-        )}
+    <div className="bg-gray-950 text-white min-h-screen p-4">
+      <h1 className="text-3xl font-bold text-center mb-8">Skins en Oferta</h1>
 
-        {/* Burbuja de descuento */}
-        <div className="absolute top-1 left-1 bg-red-700 text-white text-xs font-bold px-2 py-1 rounded-full z-10">
-          -{discount}%
+      {/* CONTENEDOR PRINCIPAL: ANUNCIOS + GRID */}
+      <div className="grid grid-cols-1 lg:grid-cols-[150px_1fr_150px] gap-4">
+        
+        {/* Anuncio lateral izquierdo */}
+        <div className="hidden lg:block bg-gray-800 text-center p-4 rounded shadow">
+          <p className="text-sm text-gray-400">Anuncio Izquierdo</p>
         </div>
 
-        {/* Capa de fondo oscuro para texto */}
-        <div className="absolute bottom-0 w-full bg-gradient-to-t from-black via-black/70 to-transparent px-3 py-4">
-          <h2 className="text-sm font-semibold text-yellow-300 leading-tight drop-shadow">
-            {skin.name}
-          </h2>
-          <div className="flex items-center gap-1 text-yellow-400 text-xs mt-1">
-            {skin.new_price}
-            <img
-              src="https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/currencies/images/riot-points-icon.svg"
-              alt="RP"
-              className="w-3 h-3 inline"
-            />
-          </div>
+        {/* Grid de skins */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
+          {skins.map((skin, index) => {
+            const imageUrl = tileMap[skin.itemId]
+            const discount = (skin.discount * 100).toFixed(0)
+            return (
+              <div
+                key={index}
+                className="relative rounded overflow-hidden shadow-lg group"
+              >
+                {imageUrl && (
+                  <img
+                    src={imageUrl}
+                    alt={skin.name}
+                    className="w-full h-full object-cover group-hover:brightness-75 transition duration-300"
+                  />
+                )}
+
+                <div className="absolute top-1 left-1 bg-red-700 text-white text-xs font-bold px-2 py-1 rounded-full z-10">
+                  -{discount}%
+                </div>
+
+                <div className="absolute bottom-0 w-full bg-gradient-to-t from-black via-black/70 to-transparent px-3 py-4">
+                  <h2 className="text-sm font-semibold text-yellow-300 leading-tight drop-shadow">
+                    {skin.name}
+                  </h2>
+                  <div className="flex items-center gap-1 text-yellow-400 text-xs mt-1">
+                    {skin.new_price}
+                    <img
+                      src="https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/currencies/images/riot-points-icon.svg"
+                      alt="RP"
+                      className="w-3 h-3 inline"
+                    />
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        {/* Anuncio lateral derecho */}
+        <div className="hidden lg:block bg-gray-800 text-center p-4 rounded shadow">
+          <p className="text-sm text-gray-400">Anuncio Derecho</p>
         </div>
       </div>
-    )
-  })}
-</div>
 
+      {/* Anuncio inferior */}
+      <div className="bg-gray-800 mt-6 text-center p-4 rounded shadow">
+        <p className="text-sm text-gray-400">Anuncio Inferior</p>
+      </div>
+    </div>
   )
 }
