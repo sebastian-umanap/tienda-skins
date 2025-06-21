@@ -13,66 +13,77 @@ type DiscountedSkin = {
 
 type SplashSkin = {
   id: number
-  splashPath: string
+  tilePath: string
 }
 
 export default function SkinsPage() {
   const [skins, setSkins] = useState<DiscountedSkin[]>([])
-  const [splashMap, setSplashMap] = useState<Record<number, string>>({})
+  const [tileMap, setTileMap] = useState<Record<number, string>>({})
 
-  // 1. Obtener skins en descuento
   useEffect(() => {
     fetch("https://raw.githubusercontent.com/sebastian-umanap/json-data/refs/heads/main/CHAMPION_SKIN_FILTERED.json")
       .then(res => res.json())
       .then(setSkins)
   }, [])
 
-  // 2. Obtener splashPaths desde nuestra API interna
   useEffect(() => {
     fetch("/api/splash")
       .then(res => res.json())
       .then((data: Record<number, SplashSkin>) => {
         const map: Record<number, string> = {}
         Object.values(data).forEach((skin) => {
-          if (skin.splashPath) {
+          if (skin.tilePath) {
             const url = "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default" +
-              skin.splashPath.toLowerCase().replace("/lol-game-data/assets/assets", "/assets")
+              skin.tilePath.toLowerCase().replace("/lol-game-data/assets/assets", "/assets")
             map[skin.id] = url
           }
         })
-        setSplashMap(map)
+        setTileMap(map)
       })
   }, [])
 
   return (
-    <div className="p-6 bg-gray-950 text-white min-h-screen">
-      <h1 className="text-3xl font-bold text-center mb-8">Skins en Oferta</h1>
+<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
+  {skins.map((skin, index) => {
+    const imageUrl = tileMap[skin.itemId]
+    const discount = (skin.discount * 100).toFixed(0)
+    return (
+      <div
+        key={index}
+        className="relative rounded overflow-hidden shadow-lg group"
+      >
+        {/* Fondo con imagen */}
+        {imageUrl && (
+          <img
+            src={imageUrl}
+            alt={skin.name}
+            className="w-full h-full object-cover group-hover:brightness-75 transition duration-300"
+          />
+        )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {skins.map((skin, index) => {
-          const imageUrl = splashMap[skin.itemId]
-          return (
-            <div
-              key={index}
-              className="bg-gray-900 rounded-xl p-4 shadow-lg hover:scale-105 transition"
-            >
-              {imageUrl && (
-                <img
-                  src={imageUrl}
-                  alt={skin.name}
-                  className="w-full h-48 object-cover rounded mb-4"
-                />
-              )}
-              <h2 className="text-xl font-semibold text-cyan-400">{skin.name}</h2>
-              <p><b>Precio original:</b> {skin.price}</p>
-              <p><b>Precio con descuento:</b> {skin.new_price}</p>
-              <p><b>Descuento:</b> {(skin.discount * 100).toFixed(0)}%</p>
-              <p><b>Desde:</b> {new Date(skin.startDate).toLocaleDateString()}</p>
-              <p><b>Hasta:</b> {new Date(skin.endDate).toLocaleDateString()}</p>
-            </div>
-          )
-        })}
+        {/* Burbuja de descuento */}
+        <div className="absolute top-1 left-1 bg-red-700 text-white text-xs font-bold px-2 py-1 rounded-full z-10">
+          -{discount}%
+        </div>
+
+        {/* Capa de fondo oscuro para texto */}
+        <div className="absolute bottom-0 w-full bg-gradient-to-t from-black via-black/70 to-transparent px-3 py-4">
+          <h2 className="text-sm font-semibold text-yellow-300 leading-tight drop-shadow">
+            {skin.name}
+          </h2>
+          <div className="flex items-center gap-1 text-yellow-400 text-xs mt-1">
+            {skin.new_price}
+            <img
+              src="https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/currencies/images/riot-points-icon.svg"
+              alt="RP"
+              className="w-3 h-3 inline"
+            />
+          </div>
+        </div>
       </div>
-    </div>
+    )
+  })}
+</div>
+
   )
 }
