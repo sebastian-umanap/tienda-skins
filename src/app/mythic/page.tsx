@@ -28,21 +28,26 @@ export default function MythicPage() {
   const [chromaMap, setChromaMap] = useState<Record<string, string>>({})
 
   // Cargar tienda mítica
-useEffect(() => {
-  const fetchData = () => {
-    fetch(`https://raw.githubusercontent.com/sebastian-umanap/json-data/refs/heads/main/MYTHIC_SHOP_FILTERED.json?ts=${Date.now()}`, {
-      cache: "no-store"
-    })
-      .then(res => res.json())
-      .then(setSections)
-      .catch(err => console.error("❌ Error cargando tienda mítica:", err))
+  const fetchData = async () => {
+    try {
+      const res = await fetch("https://api.github.com/repos/sebastian-umanap/json-data/contents/MYTHIC_SHOP_FILTERED.json", {
+        cache: "no-store"
+      })
+      const data = await res.json()
+      const decoded = atob(data.content.replace(/\n/g, '')) // 🔧 Elimina saltos de línea
+      const parsed = JSON.parse(decoded)
+      setSections(parsed)
+    } catch (err) {
+      console.error("❌ Error cargando tienda mítica desde GitHub API:", err)
+    }
   }
 
-  fetchData() // Carga inicial
-  const interval = setInterval(fetchData, 30000) // Actualiza cada 30s
-
-  return () => clearInterval(interval) // Limpia al desmontar
-}, [])
+  // ✅ Ejecutar carga inicial y recargar cada 30s
+  useEffect(() => {
+    fetchData()
+    const interval = setInterval(fetchData, 30000)
+    return () => clearInterval(interval)
+  }, [])
 
 
   // Cargar skins y cromas
