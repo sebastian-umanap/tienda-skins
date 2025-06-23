@@ -20,11 +20,29 @@ export default function SkinsPage() {
   const [skins, setSkins] = useState<DiscountedSkin[]>([])
   const [tileMap, setTileMap] = useState<Record<number, string>>({})
 
-  useEffect(() => {
-    fetch("https://raw.githubusercontent.com/sebastian-umanap/json-data/refs/heads/main/CHAMPION_SKIN_FILTERED.json")
-      .then(res => res.json())
-      .then(setSkins)
-  }, [])
+  // ✅ Obtener JSON desde GitHub API en tiempo real
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const res = await fetch("https://api.github.com/repos/sebastian-umanap/json-data/contents/CHAMPION_SKIN_FILTERED.json", {
+        cache: "no-store"
+      })
+      const data = await res.json()
+
+      // ✅ Decodificación correcta UTF-8
+      const base64 = data.content.replace(/\n/g, '')
+      const binary = Uint8Array.from(atob(base64), c => c.charCodeAt(0))
+      const decoded = new TextDecoder("utf-8").decode(binary)
+      const parsed = JSON.parse(decoded)
+
+      setSkins(parsed)
+    } catch (err) {
+      console.error("❌ Error cargando skins desde GitHub API:", err)
+    }
+  }
+
+  fetchData()
+}, [])
 
   useEffect(() => {
     fetch("/api/splash")
@@ -46,9 +64,7 @@ export default function SkinsPage() {
     <div className="bg-gray-950 text-white min-h-screen p-4">
       <h1 className="text-3xl font-bold text-center mb-8">Skins en Oferta</h1>
 
-      {/* CONTENEDOR PRINCIPAL: ANUNCIOS + GRID */}
       <div className="grid grid-cols-1 lg:grid-cols-[150px_1fr_150px] gap-4">
-        
         {/* Anuncio lateral izquierdo */}
         <div className="hidden lg:block bg-gray-800 text-center p-4 rounded shadow">
           <p className="text-sm text-gray-400">Anuncio Izquierdo</p>
